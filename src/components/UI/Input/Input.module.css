@@ -30,3 +30,9 @@
     background-color: #c06262;
     border: 1px solid #c04545;
 }
+
+.InvalidMsg {
+    margin: 0;
+    color: #c04545;
+    padding-left: 1rem;
+}

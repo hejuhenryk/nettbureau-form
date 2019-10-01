@@ -27,16 +27,14 @@ export const Input = props => {
                 {...props.inputconfig}/>
             break;
         default:
-            inputElement = <input 
-                className={styles.InputElement} 
-                value={props.value}
-                {...props}/>
+            console.log('Inveild input type')
     }
 
     return (
         <div className={styles.Input}>
             <label className={styles.Label}>{props.label}</label>
             {inputElement}
+            {props.invalidMsg && <p className={styles.InvalidMsg}>{props.invalidMsg}</p>}
         </div>
     )
 }
