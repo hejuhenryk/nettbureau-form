@@ -1,6 +1,7 @@
 import React, { useState, useReducer, useEffect } from 'react'
 import styles from './ContactData.module.css'
 import { Input, Button } from './../UI/UIcomponentsIndex'
+import { postData } from '../../dataService/dataService'
 
 
 const ContactData = props => {
@@ -8,15 +9,16 @@ const ContactData = props => {
         firstname: {
             elementType: 'input',
             label: 'Navn',
-            invalidMsg: 'Navn trenger minst 4 bookstaver',
             elementConfig: {
                 type: 'text',
-                placeholder: 'Ole Alexander'
+                placeholder: 'Ole Alexander',
+                autoComplete: 'given-name'
             },
             value: '',
             validation: {
                 isRequired: true, 
-                minLength: 2
+                minLength: 2, 
+                nameType: true
             },
             isValid: false,
             isTouched: false
@@ -26,12 +28,14 @@ const ContactData = props => {
             label: 'Etternavn',
             elementConfig: {
                 type: 'text',
-                placeholder: 'Filibom-Bom-Bom'
+                placeholder: 'Filibom-Bom-Bom',
+                autoComplete: 'family-name'
             },
             value: '',
             validation: {
                 isRequired: true, 
-                minLength: 2
+                minLength: 2, 
+                nameType: true
             },
             isValid: false,
             isTouched: false
@@ -41,12 +45,14 @@ const ContactData = props => {
             label: 'E-post',
             elementConfig: {
                 type: 'email',
-                placeholder: 'din.epost@yahoo.com'
+                placeholder: 'din.epost@yahoo.com',
+                autoComplete: 'email'
             },
             value: '',
             validation: {
                 isRequired: true,
-                minLength: 8
+                minLength: 8, 
+                emailType: true
             },
             isValid: false,
             isTouched: false
@@ -56,13 +62,15 @@ const ContactData = props => {
             label: 'Telefonnummer',
             elementConfig: {
                 type: 'text',
-                placeholder: 'XXX XX XXX'
+                placeholder: 'XXX XX XXX',
+                autoComplete: 'tel'
             },
             value: '',
             validation: {
                 isRequired: true,
                 minLength: 8,
-                maxLength: 8
+                maxLength: 12,
+                phoneType: true
             },
             isValid: false,
             isTouched: false
@@ -72,13 +80,14 @@ const ContactData = props => {
             label: 'Postnummer',
             elementConfig: {
                 type: 'text',
-                placeholder: '1234'
+                placeholder: '1234',
+                autoComplete: 'postal-code'
             },
             value: '',
             validation: {
                 isRequired: true,
                 minLength: 4,
-                maxLength: 4
+                zipCodeType: true
             },
             isValid: false,
             isTouched: false
@@ -88,14 +97,15 @@ const ContactData = props => {
             label: 'Kommentar',
             elementConfig: {
                 type: 'text',
-                placeholder: ''
+                placeholder: '',
+                autoComplete: 'off'
             },
-            value: '',
+            value: ''/* ,
             validation: {
                 isRequired: false,
                 maxLength: 300
-            },
-            isValid: false,
+            } */,
+            isValid: true,
             isTouched: false
         }
     }
@@ -110,21 +120,52 @@ const ContactData = props => {
         if (rules.maxLength) {
             isValid = value.length <= rules.maxLength && isValid
         }
+        if (rules.nameType) {
+            const re = /^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$/g
+            isValid = re.test(value) && isValid
+        }
         if (rules.emailType) {
             const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
             isValid = re.test(value) && isValid
         }
-        if (rules.phone)
+        if (rules.phoneType) {
+            const re = /^((0047)?|(\+47)?|(47)?)([- _1-9])(\d{7})$/
+            isValid = re.test(value.replace(/\s+/g, '')) && isValid
+        }
+        if (rules.zipCodeType) {
+            const re = /^(\d{4})$/
+            isValid = re.test(value.replace(/\s+/g, '')) && isValid
+        }
         return isValid
+    }
+    const invalidationMessenger = (value, rules) => {
+        let msg = 'Må fylles ut'
+        if (rules.nameType) {
+            msg = 'Må ha minst 2 bokstaver' //'Ikke gyldig navn'
+        }
+        if (rules.emailType) {
+            msg = 'E-post er ikke skrevet riktig'
+        }
+        if (rules.phoneType) {
+            msg = 'Må bestå av 8 siffer'
+            if(value.length === 8 && value[0] == 0) 
+            msg = 'Kan ikke begynne med 0'
+        }
+        if (rules.zipCodeType) {
+            msg = 'Må bestå av 4 siffer'
+        }
+        return msg
     }
     const formReducer = (state, action) => {
         let newForm = JSON.parse(JSON.stringify(state))
         newForm[action.type].value = action.payload
         if ( newForm[action.type].validation ) {
             newForm[action.type].isTouched = true
-            newForm[action.type].isValid = checkValidity(newForm[action.type].value, newForm[action.type].validation )
+            newForm[action.type].isValid = checkValidity(newForm[action.type].value, newForm[action.type].validation)
             if ( !newForm[action.type].isValid ) {
-
+                newForm[action.type].invalidMsg = invalidationMessenger(newForm[action.type].value, newForm[action.type].validation)
+            } else {
+                newForm[action.type].invalidMsg = ''
             }
         }
         return newForm    
@@ -163,6 +204,7 @@ const ContactData = props => {
         }
         console.log(customerData)
         //POST request with customerData 
+        postData(customerData).then( r => console.log(r)).catch( e => console.log(e.value.response.status) )
     }
 
     const checkIfFormIsValid = (form) => {

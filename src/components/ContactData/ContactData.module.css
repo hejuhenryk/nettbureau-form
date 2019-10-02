@@ -1,11 +1,10 @@
 .ContactData {
     position: relative;
-    /* top: 5rem; */
     margin: 10% auto;
     width: 90vw;
     max-width: 30rem;
     border: 1px solid #00D5FF;
-
+    box-shadow: #ccc  0rem 0rem .5rem .5rem  ;
 }
 
 .Title {
