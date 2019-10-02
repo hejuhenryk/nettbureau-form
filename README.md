@@ -1,5 +1,8 @@
 # Dette er min løsning for en case fra nettbureau
-# 
+# Du kan teste den på https://hejuhenryk.github.io/nettbureau-form/
+# Eller clone/lastned fra https://github.com/hejuhenryk/nettbureau-form og kjør 'npm start' i konsolen
+
+
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
