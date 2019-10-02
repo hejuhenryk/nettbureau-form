@@ -1,4 +1,5 @@
-# Dette er en case solution for nettbureau
+# Dette er min løsning for en case fra nettbureau
+# 
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
