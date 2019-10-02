@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/nettbureau-form/precache-manifest.63a51580dc7ab6719f1327993c6823a5.js"
+  "/nettbureau-form/precache-manifest.a5ff81235435a3cb002025a8ce44e69f.js"
 );
 
 self.addEventListener('message', (event) => {
