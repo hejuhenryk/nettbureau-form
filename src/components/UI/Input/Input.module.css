@@ -27,12 +27,13 @@
 }
 
 .Invalid {
-    background-color: #c06262;
+    background-color: #be9494;
     border: 1px solid #c04545;
 }
 
 .InvalidMsg {
     margin: 0;
     color: #c04545;
-    padding-left: 1rem;
+    padding-left: .3rem;
+    font-size: 0.8rem;
 }

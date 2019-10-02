@@ -1,10 +1,14 @@
 import React, { useState, useReducer, useEffect } from 'react'
 import styles from './ContactData.module.css'
-import { Input, Button } from './../UI/UIcomponentsIndex'
-import { postData } from '../../dataService/dataService'
+import { Input, Button, Modal, Loader } from './../UI/UIcomponentsIndex'
+import { postData, NotInitialized, NotInitializedType, Fetching, FailFetched, FailFetchedType, FetchedType, FetchingType } from '../../dataService/dataService'
 
 
 const ContactData = props => {
+    const [modal, setModal] = useState({...NotInitialized(''), msg: ''})
+    const backdropClickHandler = () => {
+        setModal({...NotInitialized(''), msg: ''})
+    }
     const initialForm = {
         firstname: {
             elementType: 'input',
@@ -139,7 +143,7 @@ const ContactData = props => {
         return isValid
     }
     const invalidationMessenger = (value, rules) => {
-        let msg = 'Må fylles ut'
+        let msg = ''
         if (rules.nameType) {
             msg = 'Må ha minst 2 bokstaver' //'Ikke gyldig navn'
         }
@@ -153,6 +157,9 @@ const ContactData = props => {
         }
         if (rules.zipCodeType) {
             msg = 'Må bestå av 4 siffer'
+        }
+        if(value === '') {
+            msg = 'Må fylles ut'
         }
         return msg
     }
@@ -195,6 +202,7 @@ const ContactData = props => {
     }
 
     const submitHandler = event => {
+        
         event.preventDefault()
         if(!isFormValid) return ;
         // setIsLoading(true)
@@ -202,9 +210,35 @@ const ContactData = props => {
         for (const key in formData) {
             customerData[key] = formData[key].value
         }
-        console.log(customerData)
-        //POST request with customerData 
-        postData(customerData).then( r => console.log(r)).catch( e => console.log(e.value.response.status) )
+        setModal(Fetching('data'))
+        postData(customerData)
+        .then( res => {
+            //remove spinner, add display respons data
+            let msg = ''
+            if (res.type === FailFetchedType) {
+                msg = (
+                    <div>
+                    <h5>Ops, sent ikke data, error status er {res.value.response.status}</h5>
+                    <Button type='Danger' btnCliked={backdropClickHandler}>Tilbake</Button>
+                    </div>
+                )
+            } else if (res.type === FetchedType) {
+
+                msg = (
+                    <div>
+                        <h5>Din data ble sent</h5>
+                        <p>Navn: {res.value.firstname}</p>
+                        <p>Etternavn: {res.value.lastname}</p>
+                        <p>Epost: {res.value.email}</p>
+                        <p>Telefonnummer: {res.value.phone}</p>
+                        <p>Postkode: {res.value.zipCode}</p>
+                        <p>Komentar: {res.value.comment}</p>
+                        <Button type='Success' btnCliked={backdropClickHandler}>Tilbake</Button>
+                    </div>
+                )
+            }
+            setModal({...res, msg: msg})
+        })
     }
 
     const checkIfFormIsValid = (form) => {
@@ -222,13 +256,21 @@ const ContactData = props => {
     }
 
     return (
-        <div className={styles.ContactData}>
+        <>
+            <Modal 
+                show={modal.type !== NotInitializedType} 
+                backdropClick={backdropClickHandler} 
+                >
+                    {modal.type === FetchingType ? <Loader /> : modal.msg}
+            </Modal>
+            <div className={styles.ContactData}>
             <h2 className={styles.Title}>INFORMASJON</h2>
             <form onSubmit={(event) => isFormValid ? submitHandler(event) : null}> 
                 {formInputs}
                 <Button type='Success' disabled={!isFormValid}>Send inn</Button>
             </form>
         </div>
+        </>
     )
 }
 
