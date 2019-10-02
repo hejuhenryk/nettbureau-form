@@ -1,7 +1,7 @@
 import React, { useState, useReducer, useEffect } from 'react'
 import styles from './ContactData.module.css'
-import { Input, Button, Modal, Loader } from './../UI/UIcomponentsIndex'
-import { postData, NotInitialized, NotInitializedType, Fetching, FailFetched, FailFetchedType, FetchedType, FetchingType } from '../../dataService/dataService'
+import { Input, Button, Modal, Loader } from '../UI/Index'
+import { postData, NotInitialized, NotInitializedType, Fetching, FailFetchedType, FetchedType, FetchingType } from '../../dataService/dataService'
 
 
 const ContactData = props => {
@@ -10,7 +10,7 @@ const ContactData = props => {
         setModal({...NotInitialized(''), msg: ''})
     }
     const initialForm = {
-        firstname: {
+        name: {
             elementType: 'input',
             label: 'Navn',
             elementConfig: {
@@ -26,7 +26,7 @@ const ContactData = props => {
             },
             isValid: false,
             isTouched: false
-        },
+        }/* ,
         lastname: {
             elementType: 'input',
             label: 'Etternavn',
@@ -43,7 +43,7 @@ const ContactData = props => {
             },
             isValid: false,
             isTouched: false
-        },
+        } */,
         email: {
             elementType: 'input',
             label: 'E-post',
@@ -164,6 +164,9 @@ const ContactData = props => {
         return msg
     }
     const formReducer = (state, action) => {
+        if( action.type === 'CLEAR' ) {
+            return initialForm
+        }
         let newForm = JSON.parse(JSON.stringify(state))
         newForm[action.type].value = action.payload
         if ( newForm[action.type].validation ) {
@@ -218,7 +221,7 @@ const ContactData = props => {
             if (res.type === FailFetchedType) {
                 msg = (
                     <div>
-                    <h5>Ops, sent ikke data, error status er {res.value.response.status}</h5>
+                    <h5>Ops, data ble ikke sent, error status er {res.value.response.status}</h5>
                     <Button type='Danger' btnCliked={backdropClickHandler}>Tilbake</Button>
                     </div>
                 )
@@ -227,12 +230,6 @@ const ContactData = props => {
                 msg = (
                     <div>
                         <h5>Din data ble sent</h5>
-                        <p>Navn: {res.value.firstname}</p>
-                        <p>Etternavn: {res.value.lastname}</p>
-                        <p>Epost: {res.value.email}</p>
-                        <p>Telefonnummer: {res.value.phone}</p>
-                        <p>Postkode: {res.value.zipCode}</p>
-                        <p>Komentar: {res.value.comment}</p>
                         <Button type='Success' btnCliked={backdropClickHandler}>Tilbake</Button>
                     </div>
                 )
@@ -254,6 +251,10 @@ const ContactData = props => {
         e.preventDefault()
         dispatch({type: inputType , payload: e.target.value})
     }
+    const cleanFormHandler = e => {
+        e.preventDefault()
+        dispatch({type: 'CLEAR'})
+    }
 
     return (
         <>
@@ -268,6 +269,7 @@ const ContactData = props => {
             <form onSubmit={(event) => isFormValid ? submitHandler(event) : null}> 
                 {formInputs}
                 <Button type='Success' disabled={!isFormValid}>Send inn</Button>
+                <Button type='Neutral' btnCliked={cleanFormHandler}>Clean Form</Button>
             </form>
         </div>
         </>
