@@ -5,7 +5,7 @@ export const Input = props => {
     let inputElement = null
     let inputClasses = [styles.InputElement]
 
-    if(props.isInvalid && props.shouldValidate && props.isTouched) {
+    if(!props.isValid && props.shouldValidate && props.isTouched) {
         inputClasses.push(styles.Invalid)
     } else {
         inputClasses = [styles.InputElement]
@@ -17,7 +17,7 @@ export const Input = props => {
                 className={inputClasses.join(' ')} 
                 value={props.value}
                 onChange={props.change}
-                {...props.inputconfig}/>
+                {...props.inputConfig}/>
             break;
         case ( 'textarea' ):
             inputElement = <textarea 

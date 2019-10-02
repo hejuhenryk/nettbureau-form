@@ -11,18 +11,12 @@ export const Fetched = value => ({ type: FetchedType, value})
 export const FailFetched = value => ({ type: FailFetchedType, value})
 
 export const postData = data => {
-    const cors = 'https://cors-anywhere.herokuapp.com/'
-    const url = 'https://heksemel.no/case/submit.php' //  serveren må inkludere "Access-Control-Allow-Origin"
+    const cors = 'https://cors-anywhere.herokuapp.com/' // go around CORS
+    // const url = 'https://heksemel.no/case/submit.php' //   "Access-Control-Allow-Origin" needed on server side
+    const url = 'https://jsonplaceholder.typicode.com/posts' // Fake Online REST API for Testing and Prototyping
     const dataPlus = {...data, applicant: 'Marcin Sawczuk-Szymkiewicz'}
-    // const url = 'https://jsonplaceholder.typicode.com/posts' // Fake Online REST API for Testing and Prototyping
+   
     return axios.post(`${cors}${url}`, dataPlus)
-        .then( res => {
-            console.log(res)
-            return Fetched(res.data)
-        })
-        .catch( error => {
-            return FailFetched({...error})
-        })
+        .then( res => Fetched(res.data))
+        .catch( error => FailFetched({...error}))
 }
-
-//applicant

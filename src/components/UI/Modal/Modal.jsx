@@ -4,14 +4,13 @@ import { Backdrop } from '../Index'
 
 export const Modal = props => {
     let classN = [styles.Modal, props.show ? null : styles.Away ].join(' ')
-    
     return (
         <>
-        <Backdrop show={props.show} click={props.backdropClick}/>
-        <div className={classN}>
-            {props.children}
-        </div>
-    </>
+            <Backdrop show={props.show} click={props.backdropClick}/>
+            <div className={classN}>
+                {props.children}
+            </div>
+        </>
     )
 }
 
